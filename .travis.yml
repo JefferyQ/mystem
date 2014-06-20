@@ -1,21 +1,19 @@
-language: php
+language:
+  - objective-c
 
 notifications:
   email:
     - travis-mystem@aotd.ru
 
-php:
-  - 5.3
-  - 5.4
-  - 5.5
-  - hhvm
+before_install:
+  - brew update
 
-matrix:
-  allow_failures:
-    - php: hhvm
+install:
+  - brew install php55
+  - brew install composer
+  - brew install parallel
 
 before_script:
-  - sudo apt-get install parallel
   - rm -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
   - composer install --prefer-source
   - git config --global user.name travis-ci
