@@ -9,6 +9,7 @@ before_install:
   - brew update
 
 install:
+  - brew tap homebrew/dupes
   - brew install homebrew/php/php53
   - brew install composer
   - brew install parallel
