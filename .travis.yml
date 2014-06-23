@@ -10,12 +10,12 @@ before_install:
 
 install:
   - brew tap homebrew/dupes
+  - brew tap homebrew/versions
   - brew install homebrew/php/php53
   - brew install composer
   - brew install parallel
 
 before_script:
-  - rm -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini
   - composer install --prefer-source
   - git config --global user.name travis-ci
   - git config --global user.email travis@example.com
