@@ -7,12 +7,12 @@ notifications:
 
 before_install:
   - brew update
-  - brew upgrade
-
-install:
   - brew tap homebrew/dupes
   - brew tap homebrew/versions
-  - brew install homebrew/php/php53
+  - brew tap homebrew/homebrew-php
+
+install:
+  - brew install php55
   - brew install composer
   - brew install parallel
 
