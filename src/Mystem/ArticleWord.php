@@ -7,7 +7,8 @@ namespace Mystem;
  * Initialized from Article class, has link to original article and $position, filled with in Article position
  * @package Mystem
  */
-class ArticleWord extends Word {
+class ArticleWord extends Word
+{
 
     protected static $constructorClass = '\Mystem\ArticleWord';
 
@@ -24,7 +25,8 @@ class ArticleWord extends Word {
      * @param string $article
      * @return ArticleWord
      */
-    public static function newFromLexicalString($lexicalString, $maxVariants = null, &$article = null){
+    public static function newFromLexicalString($lexicalString, $maxVariants = null, &$article = null)
+    {
         /* @var ArticleWord $word */
         $word = parent::newFromLexicalString($lexicalString, $maxVariants);
         if ($article !== null) {
@@ -39,7 +41,8 @@ class ArticleWord extends Word {
      * @param string $article
      * @return ArticleWord
      */
-    public static function stemm($word, $maxVariants = null, &$article = null){
+    public static function stemm($word, $maxVariants = null, &$article = null)
+    {
         /* @var ArticleWord $word */
         $word = parent::stemm($word, $maxVariants);
         if ($article !== null) {

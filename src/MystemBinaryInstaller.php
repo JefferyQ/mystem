@@ -5,10 +5,8 @@ use Composer\IO\IOInterface;
 use Composer\Installer\InstallationManager;
 use Composer\DependencyResolver\Operation\InstallOperation;
 use Composer\Repository\WritableRepositoryInterface;
-use Composer\Package\PackageInterface;
 use Composer\Script\Event;
 use Composer\Package\Package;
-
 
 class MystemBinaryInstaller
 {
@@ -34,7 +32,7 @@ class MystemBinaryInstaller
     public static $localRepo;
 
     /**
-     * @var \Composer\Package\RootPackage $packages
+     * @var array $config
      */
     public static $config;
 
@@ -55,9 +53,14 @@ class MystemBinaryInstaller
             self::$io->write("<error>File $fileName not exists.</error>");
             return false;
         }
-        self::$config = json_decode(file_get_contents($fileName), true);
+        $content = file_get_contents($fileName);
+        if (!$content) {
+            self::$io->write("<error>Can't read $fileName file.</error>");
+            return false;
+        }
+        self::$config = (array)json_decode($content, true);
 
-        if (!isset(self::$config['extra']['platform-specific-packages'])){
+        if (!isset(self::$config['extra']['platform-specific-packages'])) {
             return false;
         }
 
@@ -75,7 +78,9 @@ class MystemBinaryInstaller
         }
 
         if (!empty($unresolved)) {
-            self::$io->write('<error>Your requirements could not be resolved for current OS and/or processor architecture.</error>');
+            self::$io->write(
+                '<error>Your requirements could not be resolved for current OS and/or processor architecture.</error>'
+            );
             self::$io->write("\n  Unresolved platform-specific packages:");
             foreach ($unresolved as $name) {
                 self::$io->write("    - $name");
@@ -122,11 +127,13 @@ class MystemBinaryInstaller
     protected static function createPlatformSpecificPackage($packageName, $variants)
     {
         foreach ($variants as $variant) {
-            if (!empty($variant['architecture']) && $variant['architecture'] !== self::getArchitecture())
+            if (!empty($variant['architecture']) && $variant['architecture'] !== self::getArchitecture()) {
                 continue;
+            }
 
-            if (!empty($variant['os']) && $variant['os'] !== self::getOS())
+            if (!empty($variant['os']) && $variant['os'] !== self::getOS()) {
                 continue;
+            }
 
             reset($variant);
             $name = key($variant);
@@ -162,6 +169,18 @@ class MystemBinaryInstaller
         if (!$package) {
             return null;
         }
+        $new = self::bindPackageValues($newName, $package);
+        self::$localRepo->addPackage($new);
+        return $new;
+    }
+
+    /**
+     * @param string $newName
+     * @param array $package
+     * @return Package
+     */
+    protected static function bindPackageValues($newName, array $package)
+    {
         $new = new Package($newName, $package['version'], $package['version']);
         $new->setType('dist');
         if (isset($package['bin'])) {
@@ -176,7 +195,6 @@ class MystemBinaryInstaller
         if (isset($package['excludes'])) {
             $new->setArchiveExcludes($package['excludes']);
         }
-        self::$localRepo->addPackage($new);
         return $new;
     }
 
@@ -218,5 +236,4 @@ class MystemBinaryInstaller
                 return 'undefined';
         }
     }
-
-} 
+}

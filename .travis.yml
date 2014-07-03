@@ -1,10 +1,6 @@
 language:
   - objective-c
 
-notifications:
-  email:
-    - travis-mystem@aotd.ru
-
 before_install:
   - brew update
   - brew tap homebrew/dupes
@@ -14,15 +10,27 @@ before_install:
 install:
   - brew install php55
   - brew install composer
-  - brew install parallel
 
 before_script:
+  - composer self-update
   - composer install --prefer-source
-  - git config --global user.name travis-ci
-  - git config --global user.email travis@example.com
 
 script:
-  - ls -d tests/Mystem/* | parallel --gnu --keep-order 'echo "Running {} tests"; ./vendor/bin/phpunit -c tests/phpunit.xml.dist {};' || exit 1
+  - mkdir .reports
+  # Code style
+  - php vendor/bin/phpcs ./src/Mystem --standard=PSR1 --encoding=utf-8 --report=summary
+  - php vendor/bin/phpcs ./src/Mystem --standard=PSR2 --encoding=utf-8 --report=summary
+  # PHPUnit tests
+  - php vendor/bin/phpunit --configuration tests/phpunit.xml.dist --coverage-clover=.reports/clover.xml
+
+after_success:
+  # Send cover
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover .reports/clover.xml
 
 git:
   depth: 1
+
+notifications:
+  email:
+    - travis-mystem@aotd.ru
